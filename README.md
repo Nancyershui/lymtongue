@@ -1,136 +1,147 @@
-# DenseMamba Tongue Image Classification
+# LymTongue
 
-This repository contains PyTorch scripts for binary tongue image classification based on DenseNet121 and Coord-Mamba style sequence modeling. The code was organized for paper submission and public release.
+PyTorch code for binary tongue image classification experiments. The repository is organized around DenseNet121, the proposed DenseMamba/Coord-Mamba model, common classification baselines, ablation studies, and receptive-field analysis.
 
-## Project Layout
+## Repository Layout
 
 ```text
 .
 ├── scripts/
-│   ├── train/          # Main training scripts
-│   ├── ablation/       # Ablation experiments
-│   ├── visualization/  # Attention / CAM visualization scripts
-│   └── analysis/       # Parameter counting and receptive field analysis
-├── archive/
-│   └── prototypes/     # Earlier exploratory versions kept for traceability
-├── checkpoints/        # Local model checkpoints, ignored by git
-├── docs/
-│   └── FILE_INVENTORY.md
+│   ├── train/
+│   │   ├── train_proposed_densemamba.py
+│   │   ├── train_densenet_baseline.py
+│   │   └── train_baselines.py
+│   ├── ablation/
+│   │   ├── train_coord_mamba_only.py
+│   │   ├── train_mixed_dilation_only.py
+│   │   ├── train_no_coord_mamba.py
+│   │   └── train_no_mixed_dilation.py
+│   └── analysis/
+│       └── receptive_field.py
+├── prototypes/
+│   ├── proposed_v1.py
+│   ├── proposed_visual_v3.py
+│   └── train_dense_mamba_early.py
 ├── requirements.txt
+├── LICENSE
 └── README.md
 ```
 
-## Data Format
+## Installation
 
-The training scripts use `torchvision.datasets.ImageFolder` and expect this layout:
+Use a separate Python environment. Install PyTorch according to your local CUDA setup, then install the remaining dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Key dependencies include `torch`, `torchvision`, `scikit-learn`, `timm`, `mamba-ssm`, `causal-conv1d`, `einops`, `opencv-python`, `matplotlib`, and `grad-cam`.
+
+## Dataset Format
+
+The training scripts use `torchvision.datasets.ImageFolder`. The expected dataset layout is:
 
 ```text
 DATA_ROOT/
 ├── train/
-│   ├── class_0/
-│   └── class_1/
+│   ├── lymphoma/
+│   └── normal/
 ├── val/
-│   ├── class_0/
-│   └── class_1/
+│   ├── lymphoma/
+│   └── normal/
 └── test/
-    ├── class_0/
-    └── class_1/
+    ├── lymphoma/
+    └── normal/
 ```
 
-Update `data_root` or pass `--data-root` before running. Placeholder paths such as `/path/to/tongue_dataset_split` are used for anonymized release.
+The default dataset path in the scripts is the anonymized placeholder `/path/to/tongue_dataset_split`. Replace it with your local dataset path before running, or pass `--data-root` when using scripts that support command-line arguments.
 
-## Main Scripts
+## Training Scripts
 
-- `scripts/train/train_proposed_densemamba.py`: final proposed DenseNet121 + 14x14 feature map + mixed dilation + Coord-Mamba experiment. Runs five independent experiments and reports mean/std over all runs.
-- `scripts/train/train_densenet_baseline.py`: DenseNet121 baseline with five independent runs.
-- `scripts/train/train_baselines.py`: unified baseline runner for VMamba, ViT-Base, Swin-Tiny, VGG16, ResNet18, InceptionV3, EfficientNet-B0, and DenseNet121 using the paper protocol.
-- `scripts/ablation/`: ablation settings used to isolate the contribution of Coord-Mamba, mixed dilation, higher feature resolution, and preprocessing.
-- `scripts/visualization/`: attention map and Grad-CAM style visualization utilities.
-- `scripts/analysis/`: parameter count and receptive field analysis utilities.
+| File | Purpose |
+| --- | --- |
+| `scripts/train/train_proposed_densemamba.py` | Final proposed model. DenseNet121 outputs 14x14 features, denseblock4 uses mixed dilation, and Coord-Mamba is used for feature modeling. The default protocol uses 224x224 inputs, batch size 16, 30 epochs, Adam with lr=1e-4, and 5 independent runs summarized by mean and standard deviation. |
+| `scripts/train/train_densenet_baseline.py` | DenseNet121 baseline using the same five-run experimental protocol as the proposed model. |
+| `scripts/train/train_baselines.py` | Unified baseline runner for `densenet121`, `resnet18`, `vgg16`, `inception_v3`, `efficientnet_b0`, `vit_base`, `swin_tiny`, and `vmamba`. |
 
-For the current scripts, run commands from the repository root so relative output paths such as `checkpoints/` are created in the expected location.
+`train_proposed_densemamba.py` and `train_densenet_baseline.py` configure the dataset path through the `data_root` constant near the top of each script. `train_baselines.py` supports command-line arguments.
 
-## Example Usage
+## Ablation Scripts
+
+| File | Purpose |
+| --- | --- |
+| `scripts/ablation/train_no_coord_mamba.py` | Removes Coord-Mamba while keeping the 14x14 feature output and mixed dilation. |
+| `scripts/ablation/train_no_mixed_dilation.py` | Removes mixed dilation while keeping the 14x14 feature output and Coord-Mamba. |
+| `scripts/ablation/train_mixed_dilation_only.py` | Keeps mixed dilation only, without the 14x14 feature-output modification or Coord-Mamba. |
+| `scripts/ablation/train_coord_mamba_only.py` | Keeps Coord-Mamba only, without the 14x14 feature-output modification or mixed dilation. |
+
+The ablation scripts configure `data_root`, `save_path`, `batch_size`, `num_epochs`, and related settings as constants near the top of each file.
+
+## Analysis and Prototypes
+
+| File | Purpose |
+| --- | --- |
+| `scripts/analysis/receptive_field.py` | Computes the theoretical receptive field of the modified DenseNet121 backbone and can draw selected receptive-field boxes on a 224x224 input image. |
+| `prototypes/proposed_v1.py` | Early training version of the proposed model, kept for traceability. |
+| `prototypes/proposed_visual_v3.py` | Earlier visualization-oriented version of the proposed model with a more complete heatmap workflow. |
+| `prototypes/train_dense_mamba_early.py` | Earlier DenseNet + Mamba training attempt. |
+
+Files under `prototypes/` are not the current main experiment entry points. They are retained to document exploratory development.
+
+## Usage Examples
+
+Run commands from the repository root. For scripts without command-line dataset arguments, update `data_root` inside the script first.
 
 ```bash
 python scripts/train/train_proposed_densemamba.py
 python scripts/train/train_densenet_baseline.py
 ```
 
-Unified baseline training:
+Unified baseline examples:
 
 ```bash
-python scripts/train/train_baselines.py --model resnet18 --data-root /path/to/dataset
-python scripts/train/train_baselines.py --model efficientnet_b0 --data-root /path/to/dataset
-python scripts/train/train_baselines.py --model vit_base --data-root /path/to/dataset
+python scripts/train/train_baselines.py \
+  --model resnet18 \
+  --data-root /path/to/tongue_dataset_split
+
+python scripts/train/train_baselines.py \
+  --model efficientnet_b0 \
+  --data-root /path/to/tongue_dataset_split \
+  --output-dir outputs/baselines
 ```
 
-Grad-CAM comparison for the paper-style visualization:
+Ablation examples:
 
 ```bash
-python scripts/visualization/visualize_gradcam_comparison.py \
-  --data-root /path/to/dataset \
-  --densenet-checkpoint checkpoints/densenet121_run1.pth \
-  --lymtongue-checkpoint checkpoints/densenet_mamba_coord_run1.pth
+python scripts/ablation/train_no_coord_mamba.py
+python scripts/ablation/train_no_mixed_dilation.py
+python scripts/ablation/train_mixed_dilation_only.py
+python scripts/ablation/train_coord_mamba_only.py
 ```
 
-## Release Notes
+Receptive-field analysis:
 
-- `checkpoints/`, result JSON files, CAM outputs, and Python cache files are ignored by `.gitignore`.
-- Early exploratory scripts are preserved under `archive/prototypes/` instead of being removed.
-- Placeholder dataset paths are used to avoid exposing local experiment environments.
+```bash
+python scripts/analysis/receptive_field.py
+```
 
+To draw receptive fields on a real image, update `image_path` near the bottom of `scripts/analysis/receptive_field.py`.
 
+## Outputs
 
-# File Inventory
+The training scripts write result files either to the repository root or to the configured output directory:
 
-This document records what each script is for after repository cleanup.
+- `checkpoints/`: model checkpoints for the proposed model, DenseNet baseline, and ablation runs.
+- `densenet_mamba_coord_run*_results.json` and `densenet_mamba_coord_5runs_summary.*`: per-run and five-run summary outputs for the proposed model.
+- `densenet121_run*_results.json` and `densenet121_5runs_summary.*`: per-run and five-run summary outputs for the DenseNet121 baseline.
+- `outputs/baselines/<model>/`: checkpoints and summary JSON files from the unified baseline runner.
+- `rf_db4_center_on_resized_input.png` and `rf_multi_on_resized_input.png`: example receptive-field visualization outputs.
 
-## Main Training
+Do not commit local datasets, model checkpoints, or large experimental outputs unless they are required for a specific release.
 
-| File | Purpose |
-| --- | --- |
-| `scripts/train/train_proposed_densemamba.py` | Final proposed model. DenseNet121 is modified to output 14x14 features, denseblock4 uses mixed dilation, and Coord-Mamba is used for feature modeling. Uses the paper protocol: 224x224 inputs, 30 epochs, Adam with lr=1e-4, and five independent runs summarized by mean/std. |
-| `scripts/train/train_densenet_baseline.py` | DenseNet121 baseline with the same five-run paper protocol. |
-| `scripts/train/train_baselines.py` | Unified baseline runner. The `build_baseline_model()` function covers DenseNet121, ResNet18, VGG16, InceptionV3, EfficientNet-B0, ViT-Base, Swin-Tiny, and VMamba under one shared training/evaluation pipeline. |
+## Notes
 
-## Ablation Experiments
-
-| File | Purpose |
-| --- | --- |
-| `scripts/ablation/train_no_coord_mamba.py` | Ablation without Coord-Mamba; keeps 14x14 feature output and mixed dilation. |
-| `scripts/ablation/train_no_mixed_dilation.py` | Ablation without mixed dilation; keeps 14x14 feature output and Coord-Mamba. |
-| `scripts/ablation/train_mixed_dilation_only.py` | Ablation with mixed dilation only; no 14x14 feature output modification and no Coord-Mamba. |
-| `scripts/ablation/train_coord_mamba_only.py` | Ablation with Coord-Mamba only; no A2-style 14x14 feature output and no mixed dilation. |
-
-## Visualization
-
-| File | Purpose |
-| --- | --- |
-| `scripts/visualization/visualize_attention_peak_region.py` | Main attention visualization script using attention pooling, peak connected region filtering, and tongue-region constrained heatmaps. |
-| `scripts/visualization/visualize_gradcam_comparison.py` | Grad-CAM comparison script for trained DenseNet121 and LymTongue checkpoints, intended to reproduce the paper-style visualization comparison. |
-| `scripts/visualization/visualize_proposed_fig9_v1.py` | Earlier Fig.9-style visualization for top discriminative regions and masked response maps. |
-| `scripts/visualization/visualize_gradcam_imagenet.py` | Generic DenseNet121 Grad-CAM utility using ImageNet pretrained weights. Useful as a sanity-check visualization script, not the proposed model visualization. |
-
-## Analysis Utilities
-
-| File | Purpose |
-| --- | --- |
-| `scripts/analysis/count_parameters.py` | Counts model parameters for the proposed DenseNet + Coord-Mamba architecture and fallback variants. |
-| `scripts/analysis/receptive_field.py` | Computes and visualizes receptive fields for the modified DenseNet121 backbone. |
-
-## Archived Prototypes
-
-| File | Purpose |
-| --- | --- |
-| `archive/prototypes/proposed_v1.py` | Early proposed-model training script. |
-| `archive/prototypes/proposed_visual_v3.py` | Later visualization-oriented proposed-model variant with tightened heatmap display. |
-| `archive/prototypes/train_dense_mamba_early.py` | Earlier DenseNet + Mamba training attempt. |
-| `archive/prototypes/train_proposed_384_keep_ratio_pad.py` | Exploratory 384 input keep-ratio padding experiment. Archived because the paper protocol uses 224x224 inputs. |
-
-## Generated Or Local Files
-
-| Path | Purpose |
-| --- | --- |
-| `checkpoints/` | Local model checkpoints. Do not commit large checkpoint files unless the journal or release plan requires them. |
-| `__pycache__/` | Python cache files. Safe to delete locally and ignored by git. |
+- Run scripts from the repository root so relative output paths are created in the expected location.
+- The public repository does not include the dataset or trained weights.
+- The `vmamba` baseline expects a local `Baseline/VMamba` code directory. If that directory is unavailable, run the built-in baseline models first.
+- Some scripts use ImageNet pretrained weights. The first run may need network access to download those weights.
