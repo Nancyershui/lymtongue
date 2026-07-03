@@ -1,6 +1,9 @@
 torch
 torchvision
 numpy
+pandas
+scipy
+scikit-image
 scikit-learn
 tqdm
 einops

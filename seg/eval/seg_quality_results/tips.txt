@@ -1,0 +1,67 @@
+1) 收集图像 ...
+   GroundedSAM 图像数: 925
+   TongueSAM   图像数: 914
+2) 计算每张图的无监督指标 ...
+[GroundedSAM] 已处理 50/925
+[GroundedSAM] 已处理 100/925
+[GroundedSAM] 已处理 150/925
+[GroundedSAM] 已处理 200/925
+[GroundedSAM] 已处理 250/925
+[GroundedSAM] 已处理 300/925
+[GroundedSAM] 已处理 350/925
+[GroundedSAM] 已处理 400/925
+[GroundedSAM] 已处理 450/925
+[GroundedSAM] 已处理 500/925
+[GroundedSAM] 已处理 550/925
+[GroundedSAM] 已处理 600/925
+[GroundedSAM] 已处理 650/925
+[GroundedSAM] 已处理 700/925
+[GroundedSAM] 已处理 750/925
+[GroundedSAM] 已处理 800/925
+[GroundedSAM] 已处理 850/925
+[GroundedSAM] 已处理 900/925
+[GroundedSAM] 已处理 925/925
+[TongueSAM] 已处理 50/914
+[TongueSAM] 已处理 100/914
+[TongueSAM] 已处理 150/914
+[TongueSAM] 已处理 200/914
+[TongueSAM] 已处理 250/914
+[TongueSAM] 已处理 300/914
+[TongueSAM] 已处理 350/914
+[TongueSAM] 已处理 400/914
+[TongueSAM] 已处理 450/914
+[TongueSAM] 已处理 500/914
+[TongueSAM] 已处理 550/914
+[TongueSAM] 已处理 600/914
+[TongueSAM] 已处理 650/914
+[TongueSAM] 已处理 700/914
+[TongueSAM] 已处理 750/914
+[TongueSAM] 已处理 800/914
+[TongueSAM] 已处理 850/914
+[TongueSAM] 已处理 900/914
+[TongueSAM] 已处理 914/914
+3) 自动配对两种方法的结果 ...
+   成功配对数: 914
+   未配对/配对备注数: 22
+4) 统计汇总 ...
+5) 保存结果 ...
+6) 生成箱线图 ...
+
+完成。关键输出文件：
+- seg_quality_results/groundedsam_metrics.csv
+- seg_quality_results/tonguesam_metrics.csv
+- seg_quality_results/paired_metrics.csv
+- seg_quality_results/paired_statistics.csv
+- seg_quality_results/summary_by_method.csv
+- seg_quality_results/unmatched_or_pairing_notes.csv
+
+指标解释（方向）：
+  solidity            越大越好：越饱满，凹陷越少
+  hole_ratio          越小越好：内部孔洞越少
+  border_touch_ratio  越小越好：越不容易触边/裁切
+  norm_perimeter      越小越好：同面积下周长越短，边界越规整
+  boundary_roughness  越小越好：边界越平滑
+  fourier_hf_energy   越小越好：轮廓高频越少，锯齿/抖动越少
+  symmetry            越大越好：左右更对称
+  width_smoothness    越小越好：纵向宽度曲线更平滑自然
+  composite_quality   越大越好：基于以上指标的相对综合分

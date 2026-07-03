@@ -1,0 +1,23 @@
+﻿sample_key,method,rel_path,reason
+lymphoma/426,GroundedSAM,gs_lymphoma/426.png,no matching TongueSAM file
+lymphoma/426,pairing_note,,"duplicate or count mismatch: gs=1, ts=0"
+lymphoma/502,GroundedSAM,gs_lymphoma/502.png,no matching TongueSAM file
+lymphoma/502,pairing_note,,"duplicate or count mismatch: gs=1, ts=0"
+lymphoma/511,GroundedSAM,gs_lymphoma/511.png,no matching TongueSAM file
+lymphoma/511,pairing_note,,"duplicate or count mismatch: gs=1, ts=0"
+lymphoma/538,GroundedSAM,gs_lymphoma/538.png,no matching TongueSAM file
+lymphoma/538,pairing_note,,"duplicate or count mismatch: gs=1, ts=0"
+lymphoma/574,GroundedSAM,gs_lymphoma/574.png,no matching TongueSAM file
+lymphoma/574,pairing_note,,"duplicate or count mismatch: gs=1, ts=0"
+lymphoma/592,GroundedSAM,gs_lymphoma/592.png,no matching TongueSAM file
+lymphoma/592,pairing_note,,"duplicate or count mismatch: gs=1, ts=0"
+lymphoma/593,GroundedSAM,gs_lymphoma/593.png,no matching TongueSAM file
+lymphoma/593,pairing_note,,"duplicate or count mismatch: gs=1, ts=0"
+lymphoma/617,GroundedSAM,gs_lymphoma/617.png,no matching TongueSAM file
+lymphoma/617,pairing_note,,"duplicate or count mismatch: gs=1, ts=0"
+lymphoma/63,GroundedSAM,gs_lymphoma/63.png,no matching TongueSAM file
+lymphoma/63,pairing_note,,"duplicate or count mismatch: gs=1, ts=0"
+normal/148,GroundedSAM,gs_normal/148.png,no matching TongueSAM file
+normal/148,pairing_note,,"duplicate or count mismatch: gs=1, ts=0"
+normal/44,GroundedSAM,gs_normal/44.png,no matching TongueSAM file
+normal/44,pairing_note,,"duplicate or count mismatch: gs=1, ts=0"
